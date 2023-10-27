@@ -1,0 +1,13 @@
+.main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100svh;
+    gap: 1rem;
+
+    @media (width <= 425px) {
+        margin: 0 auto;
+        padding: 0;
+        gap: 0;
+    }
+}

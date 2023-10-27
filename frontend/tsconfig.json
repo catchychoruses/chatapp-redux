@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "es2021",
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*", ""],
+
+      "@views/*": ["views/*"],
+      "@store/*": ["store/*"],
+      "@slices/*": ["store/slices/*"],
+      "@hooks/*": ["hooks/*"],
+      "@components/*": ["shared/components/*"]
+    }
+  }
+}

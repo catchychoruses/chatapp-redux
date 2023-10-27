@@ -1,0 +1,84 @@
+@import '../../../global';
+
+@keyframes modal-pop {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.dialog-outer {
+    border: none;
+    height: 100svh;
+    text-align: center;
+    background: none;
+    margin: 0 atuo;
+
+    .dialog-inner {
+        @include container-style;
+
+        animation: modal-pop 0.1s ease-in-out;
+        box-shadow:
+            0 40px 20px rgb(0 0 0 / 20%),
+            0 0 15px rgb(0 0 0 / 10%),
+            0 0 0 1px rgb(0 0 0 / 5%),
+            0 0 0 1px rgb(0 0 0 / 50%);
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 320px;
+        height: 400px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            min-width: 0;
+            min-height: 0;
+            position: absolute;
+            left: 0;
+        }
+
+        .header {
+            font-size: 2rem;
+            font-weight: 600;
+            padding-top: 2rem;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            width: 100%;
+        }
+
+        button {
+            max-width: 10rem;
+            margin-bottom: 2rem;
+        }
+
+        &.dialog-out {
+            transform: all 0.1s ease-in-out;
+            opacity: 0;
+        }
+    }
+}
+
+@include themify($themes) {
+    background-color: themed('background');
+    color: themed('font-color');
+}
+
+::backdrop {
+    background-color: hsl(240deg 2% 12% / 50%);
+    backdrop-filter: blur(5px);
+    position: relative;
+    animation: modal-pop 0.1s ease-in-out;
+}

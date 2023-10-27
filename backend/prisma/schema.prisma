@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String       @id @default(uuid())
+  username   String
+  email      String
+  password   String
+  roomMember RoomMember[]
+  token      String
+}
+
+model RoomMember {
+  membershipId      Int @id  @unique @default(autoincrement())
+  user       User      @relation(fields: [userId], references: [id])
+  userId     String    
+  room       Room      @relation(fields: [roomId], references: [roomId])
+  roomId     String
+  timeJoined DateTime
+  messages   Message[]
+}
+
+model Room {
+  roomId      String       @id @unique @default(uuid())
+  roomMembers RoomMember[]
+  messages    Message[]
+}
+
+model Message {
+  messageId Int        @id @unique @default(autoincrement())
+  sentBy    RoomMember @relation(fields: [memberId], references: [membershipId])
+  memberId  Int
+  content   String
+  timeSent  DateTime
+  room      Room       @relation(fields: [roomId], references: [roomId])
+  roomId    String
+  seen      Boolean?
+}
+
+model Token {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  valid      Boolean  @default(true)
+  expiration DateTime
+  userId     String
+}

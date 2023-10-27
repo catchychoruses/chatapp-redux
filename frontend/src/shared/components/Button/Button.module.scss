@@ -1,0 +1,53 @@
+@import '../../../global';
+
+.button {
+    box-shadow:
+        0 0 15px rgb(0 0 0 / 10%),
+        0 0 0 1px rgb(0 0 0 / 5%),
+        0 0 0 1px rgb(0 0 0 / 50%);
+    border-radius: 15px;
+    border: none !important;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        box-shadow: inset 0 0 0 1px rgb(255 255 255 / 15%);
+        border-radius: 10px;
+        z-index: 999999;
+        pointer-events: none;
+    }
+}
+
+.default {
+    min-width: 5rem;
+    min-height: 2rem;
+    margin: 0.5rem;
+    padding: 0.5rem;
+    font-weight: 400;
+    font-size: 1rem;
+    text-align: center;
+    display: grid;
+    place-content: center;
+}
+
+.circle {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    min-height: 40px;
+    border-radius: 50%;
+    margin: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@include themify($themes) {
+    background-color: themed('secondary') !important;
+    border: 2px solid themed('font-color');
+    color: themed('font-color');
+}

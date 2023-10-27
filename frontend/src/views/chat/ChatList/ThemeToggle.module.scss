@@ -1,0 +1,5 @@
+@import '../../../global';
+
+@include themify($themes) {
+    background-color: themed('background');
+}
