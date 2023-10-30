@@ -1,19 +1,18 @@
-FROM node:21
+FROM node:21-alpine
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-
 COPY package*.json ./
 
 COPY .env ./
 
-RUN npm install -omit-dev && npm i -g ts-node nodemon 
+RUN npm install  && npm i -g ts-node nodemon 
    
+
 COPY . .
 
-WORKDIR /app/dist
 
 EXPOSE 3000
 
-CMD [ "npm", "start" ]
+CMD [ "npm", "run" ,"dev" ]

@@ -67,7 +67,7 @@ export const logoutAPI = createAsyncThunk(
       setUserData({
         authenticated: false,
         username: '',
-        id: '',
+        ID: '',
         token: '',
         email: ''
       })

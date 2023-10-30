@@ -34,24 +34,24 @@ export const ChatList = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleChangeRoom = useCallback(
-    (roomId: string, displayName: string) => {
+    (roomID: string, displayName: string) => {
       if (pathname === '/chat-list') navigate('/');
 
-      if (roomId !== currentRoom.id) {
+      if (roomID !== currentRoom.ID) {
         dispatch(
           setCurrentRoom({
-            prevRoomId: currentRoom.id,
-            nextRoom: { id: roomId, displayName }
+            prevRoomID: currentRoom.ID,
+            nextRoom: { ID: roomID, displayName }
           })
         );
-        emitRoomChange({ prevRoomId: currentRoom.id, nextRoomId: roomId });
+        emitRoomChange({ prevRoomID: currentRoom.ID, nextRoomID: roomID });
         sessionStorage.setItem(
           'currentRoom',
-          JSON.stringify({ id: roomId, displayName })
+          JSON.stringify({ ID: roomID, displayName })
         );
       }
     },
-    [currentRoom.id, dispatch, pathname, navigate, emitRoomChange]
+    [currentRoom.ID, dispatch, pathname, navigate, emitRoomChange]
   );
 
   const toggleNewChatDialog = () => {
@@ -60,7 +60,7 @@ export const ChatList = () => {
 
   useEffect(() => {
     if (currentRoom) {
-      dispatch(fetchRooms(user.id));
+      dispatch(fetchRooms(user.ID));
     }
   }, [user, currentRoom, dispatch]);
 
@@ -69,7 +69,7 @@ export const ChatList = () => {
       className={clsx({
         [styles['chat-list']]: true,
         [styles[`${theme}-theme`]]: true,
-        [styles.hidden]: location.pathname === '/',
+        [styles.hIDden]: location.pathname === '/',
         [styles.browser]: location.pathname === '/'
       })}
     >
@@ -81,11 +81,11 @@ export const ChatList = () => {
           <div
             className={clsx({
               [styles['chat-list-item']]: true,
-              [styles.current]: room.roomId === currentRoom.id,
+              [styles.current]: room.roomID === currentRoom.ID,
               [styles[`${theme}-theme`]]: true
             })}
-            key={room.roomId}
-            onClick={() => handleChangeRoom(room.roomId, room.displayName)}
+            key={room.roomID}
+            onClick={() => handleChangeRoom(room.roomID, room.displayName)}
           >
             <User2Icon size={'2.5rem'} className={styles.avatar} />
             <div className={styles['msg-info']}>

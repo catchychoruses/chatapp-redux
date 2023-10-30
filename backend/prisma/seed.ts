@@ -15,7 +15,7 @@ async function main() {
 
     const user = await prisma.user.upsert({
       where: {
-        id: randomUUID()
+        ID: randomUUID()
       },
       update: {},
       create: {
@@ -27,7 +27,7 @@ async function main() {
     });
 
     const token = jwt.sign(
-      { user_id: user.id, email: user.email },
+      { user_id: user.ID, email: user.email },
       process.env.TOKEN_KEY as jwt.Secret,
       {
         expiresIn: '2h'
@@ -36,7 +36,7 @@ async function main() {
 
     const completeUser = await prisma.user.update({
       where: {
-        id: user.id
+        ID: user.ID
       },
       data: {
         token
@@ -51,8 +51,8 @@ async function main() {
     data: {
       roomMembers: {
         create: [
-          { userId: (await users[0]).id, timeJoined },
-          { userId: (await users[1]).id, timeJoined }
+          { userID: (await users[0]).ID, timeJoined },
+          { userID: (await users[1]).ID, timeJoined }
         ]
       }
     }

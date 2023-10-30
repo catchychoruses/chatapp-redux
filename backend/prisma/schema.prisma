@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id         String       @id @default(uuid())
+  ID         String       @id @default(uuid())
   username   String
   email      String
   password   String
@@ -17,37 +17,29 @@ model User {
 }
 
 model RoomMember {
-  membershipId      Int @id  @unique @default(autoincrement())
-  user       User      @relation(fields: [userId], references: [id])
-  userId     String    
-  room       Room      @relation(fields: [roomId], references: [roomId])
-  roomId     String
+  memberID      Int @id  @unique @default(autoincrement())
+  user       User      @relation(fields: [userID], references: [ID])
+  userID     String    
+  room       Room      @relation(fields: [roomID], references: [roomID])
+  roomID     String
   timeJoined DateTime
   messages   Message[]
 }
 
 model Room {
-  roomId      String       @id @unique @default(uuid())
+  roomID      String       @id @unique @default(uuid())
   roomMembers RoomMember[]
   messages    Message[]
 }
 
 model Message {
-  messageId Int        @id @unique @default(autoincrement())
-  sentBy    RoomMember @relation(fields: [memberId], references: [membershipId])
-  memberId  Int
+  messageID Int        @id @unique @default(autoincrement())
+  sentBy    RoomMember @relation(fields: [memberID], references: [memberID])
+  memberID  Int
   content   String
   timeSent  DateTime
-  room      Room       @relation(fields: [roomId], references: [roomId])
-  roomId    String
+  room      Room       @relation(fields: [roomID], references: [roomID])
+  roomID    String
   seen      Boolean?
 }
 
-model Token {
-  id         Int      @id @default(autoincrement())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  valid      Boolean  @default(true)
-  expiration DateTime
-  userId     String
-}

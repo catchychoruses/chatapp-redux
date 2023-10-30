@@ -1,23 +1,28 @@
 version: "3.9"
 services:
   backend:
-    stdin_open: true
+    hostname: backend
+    container_name: backend
     build:
       context: ./backend
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-
+    networks:
+      - chatapp
   frontend:
+    hostname: frontend
+    container_name: frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-    network_mode: "host"
     depends_on:
       - backend
-
-volumes:
-  postgres-data:
-  pgadmin-data:
+    networks:
+      - chatapp
+networks:
+  chatapp:
+    external:
+      name: chatapp

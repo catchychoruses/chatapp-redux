@@ -1,15 +1,25 @@
 import { io } from 'socket.io-client';
 import { createContext, useEffect, useState } from 'react';
-import { receiveMessage, selectUserData, setCurrentRoom } from '@/store/slices';
+import {
+  fetchMessages,
+  receiveMessage,
+  selectCurrentRoom,
+  selectRooms,
+  selectUserData,
+  setCurrentRoom
+} from '@/store/slices';
 import { addAppListener } from '@/store/socketIOMiddleware';
 import { MessageType } from '@/types';
 import { useAppDispatch, useAppSelector } from '@/store/reduxHelpers';
 import { fetchRooms } from '@/store/slices/rooms';
+import { throttle } from 'lodash-es';
 
 export const useWebSocket = () => {
   const appDispatch = useAppDispatch();
 
-  const { id } = useAppSelector(selectUserData);
+  const user = useAppSelector(selectUserData);
+  const currentRoom = useAppSelector(selectCurrentRoom);
+  const rooms = useAppSelector(selectRooms);
   const [userTyping, setUserTyping] = useState<string | null>(null);
 
   const [socket] = useState(() =>
@@ -19,26 +29,37 @@ export const useWebSocket = () => {
   );
 
   const emitRoomChange = ({
-    prevRoomId,
-    nextRoomId
+    prevRoomID,
+    nextRoomID
   }: {
-    prevRoomId?: string;
-    nextRoomId: string;
+    prevRoomID?: string;
+    nextRoomID: string;
   }) => {
-    if (prevRoomId) {
-      socket.emit('leaveRoom', prevRoomId);
+    if (prevRoomID) {
+      socket.emit('leaveRoom', prevRoomID);
     }
-    socket.emit('joinRoom', nextRoomId);
+    socket.emit('joinRoom', nextRoomID);
   };
 
   const emitMessage = (message: {
     content: string;
     sentBy: string;
-    roomId: string;
+    roomID: string;
   }) => {
     socket.emit('message', message);
-    setTimeout(() => appDispatch(fetchRooms(id)), 2000);
+    setTimeout(() => appDispatch(fetchRooms(user.ID)), 2000);
   };
+
+  const emitTyping = throttle(() => {
+    socket.emit('typing', { username: user.username, roomID: currentRoom.ID });
+  }, 5000);
+
+  useEffect(() => {
+    if (rooms.length) {
+      socket.emit('joinRoom', currentRoom.ID);
+      appDispatch(fetchMessages(currentRoom.ID));
+    }
+  }, [rooms, currentRoom, appDispatch, socket]);
 
   useEffect(() => {
     const unsubscribe = appDispatch(
@@ -46,16 +67,15 @@ export const useWebSocket = () => {
         type: 'messages/fetchMessages/fulfilled',
         effect: (action, { dispatch, getState, unsubscribe }) => {
           unsubscribe();
-          const id = getState().auth.userData.id;
+          const ID = getState().auth.userData.ID;
           const currentRoom = getState().rooms.currentRoom;
-
           socket.on('message', (message: MessageType) => {
-            if (message.roomId === currentRoom.id) {
+            if (message.roomID === currentRoom.ID) {
               dispatch(receiveMessage(message));
               setUserTyping(null);
             }
 
-            dispatch(fetchRooms(id));
+            dispatch(fetchRooms(ID));
           });
         }
       })
@@ -72,7 +92,7 @@ export const useWebSocket = () => {
           sessionStorage.setItem(
             'currentRoom',
             JSON.stringify({
-              id: action.payload.nextRoom.id,
+              ID: action.payload.nextRoom.ID,
               displayName: action.payload.nextRoom.displayName
             })
           );
@@ -95,7 +115,7 @@ export const useWebSocket = () => {
     };
   }, [socket]);
 
-  return { socket, emitRoomChange, emitMessage, userTyping };
+  return { socket, emitRoomChange, emitMessage, userTyping, emitTyping };
 };
 
 export const SocketContext = createContext(

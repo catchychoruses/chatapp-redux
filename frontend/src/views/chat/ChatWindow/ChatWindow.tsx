@@ -1,11 +1,9 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { ChatBar } from './ChatBar';
 import styles from './ChatWindow.module.scss';
 import { Send } from 'lucide-react';
-import { Message } from './Message';
 import { useAppDispatch, useAppSelector } from '@/store/reduxHelpers';
 import {
-  fetchMessages,
   selectCurrentRoom,
   selectMessages,
   selectMessagesLoadingState,
@@ -16,6 +14,7 @@ import clsx from 'clsx';
 import { ThemeContext } from '@/context/theme/themeContext';
 import { Button } from '@/shared/components/Button';
 import { SocketContext } from '@/context/socket';
+import { Messages } from './Messages/Messages';
 
 export const ChatWindow = () => {
   const dispatch = useAppDispatch();
@@ -28,11 +27,11 @@ export const ChatWindow = () => {
   const [msgInput, setMsgInput] = useState('');
 
   const { theme } = useContext(ThemeContext);
-  const { socket, emitMessage, userTyping } = useContext(SocketContext);
+  const { emitMessage, emitTyping, userTyping } = useContext(SocketContext);
 
   const handleInput = (input: string) => {
     setMsgInput(input);
-    socket.emit('typing', { username: user.username, roomId: currentRoom.id });
+    emitTyping();
   };
 
   const handleSendMessage = (content: string) => {
@@ -45,49 +44,27 @@ export const ChatWindow = () => {
       dispatch(
         sendMessage({
           content,
-          sentBy: { username: user.username, userId: user.id },
-          roomId: currentRoom.id,
+          sentBy: { username: user.username, userID: user.ID },
+          roomID: currentRoom.ID,
           timeSent: time
         })
       );
-      emitMessage({ content, sentBy: user.id, roomId: currentRoom.id });
+      emitMessage({ content, sentBy: user.ID, roomID: currentRoom.ID });
 
       setMsgInput('');
     }
   };
 
-  useEffect(() => {
-    if (currentRoom) {
-      socket.emit('joinRoom', currentRoom.id);
-      dispatch(fetchMessages(currentRoom.id));
-    }
-  }, [currentRoom, dispatch, socket]);
-
   return (
     <div className={clsx(styles['chat-window'], styles[`${theme}-theme`])}>
       <ChatBar theme={theme} />
 
-      <div className={styles.messages}>
-        <div
-          className={clsx({
-            [styles.typing]: true,
-            [styles['is-typing']]: userTyping
-          })}
-        >
-          {userTyping} is typing...
-        </div>
-
-        {loading ? (
-          <p className={styles.status}>Loading...</p>
-        ) : !messages.length ? (
-          <p className={styles.status}>Your messages will go here! :)</p>
-        ) : (
-          messages.map((message, index) => (
-            <Message message={message} currentUserId={user?.id} key={index} />
-          ))
-        )}
-      </div>
-
+      <Messages
+        messages={messages}
+        loading={loading}
+        userID={user.ID}
+        userTyping={userTyping}
+      />
       <form
         className={styles['new-msg']}
         onSubmit={(e) => {

@@ -11,7 +11,7 @@ const initialState = {
   userData: user || {
     authenticated: false,
     username: '',
-    id: '',
+    ID: '',
     token: '',
     email: ''
   },

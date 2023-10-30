@@ -1,6 +1,4 @@
-import bcrypt from 'bcryptjs';
 import env from 'dotenv';
-import jwt from 'jsonwebtoken';
 import express, { Express, Request, Response } from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -8,7 +6,14 @@ import cors from 'cors';
 import { prisma } from '../prisma';
 import auth from './middleware/auth';
 
-import { createNewMessage, getAllRooms } from './queries';
+import {
+  createNewMessage,
+  createUser,
+  getAllRooms,
+  getMessage,
+  getUser,
+  loginUser
+} from './queries';
 
 const PORT = 3000;
 
@@ -31,49 +36,20 @@ server.listen(PORT, () => {
 });
 
 app.post('/register', async (req: Request, res: Response) => {
-  const data: { email: string; username: string; password: string } = req.body;
-  const oldUser = await prisma.user.findFirst({ where: { email: data.email } });
-  if (oldUser) {
+  const userData: { email: string; username: string; password: string } =
+    req.body;
+
+  const existingUser = await prisma.user.findFirst({
+    where: { email: userData.email }
+  });
+
+  if (existingUser) {
     res.status(400).send('Email already in use');
     return;
   }
 
-  const encryptedPassword = await bcrypt.hash(data.password, 10);
-
   try {
-    const user = await prisma.user.create({
-      data: {
-        username: String(data.username),
-        password: encryptedPassword,
-        token: '',
-        email: data.email
-      }
-    });
-
-    const token = jwt.sign(
-      { user_id: user.id, email: data.email },
-      process.env.TOKEN_KEY as jwt.Secret,
-      {
-        expiresIn: '2h'
-      }
-    );
-
-    const userWithToken = await prisma.user.update({
-      where: {
-        id: user.id
-      },
-      data: {
-        token
-      },
-      select: {
-        password: false,
-        id: true,
-        username: true,
-        email: true,
-        token: true
-      }
-    });
-
+    const userWithToken = await createUser(userData);
     res.status(201).json({ ok: true, userData: { ...userWithToken } });
   } catch (err) {
     console.log(err);
@@ -83,42 +59,30 @@ app.post('/register', async (req: Request, res: Response) => {
 app.post('/login', async (req: Request, res: Response) => {
   try {
     const data: { email: string; password: string } = req.body;
-    const user = await prisma.user.findFirst({ where: { email: data.email } });
 
-    if (user && (await bcrypt.compare(data.password, user.password))) {
-      const token = jwt.sign(
-        { user_id: user.id, email: data.email },
-        process.env.TOKEN_KEY as jwt.Secret,
-        {
-          expiresIn: '2h'
-        }
-      );
+    const user = await getUser(data.email);
 
-      const userData = await prisma.user.update({
-        where: { id: user.id },
-        data: { token },
-        select: {
-          id: true,
-          username: true,
-          token: true,
-          email: true
-        }
-      });
+    if (user) {
+      const userWithUpdatedToken = await loginUser(user, data.password);
 
-      res.status(200).json({ ok: true, userData: { ...userData } });
+      if (userWithUpdatedToken) {
+        res
+          .status(200)
+          .json({ ok: true, userData: { ...userWithUpdatedToken } });
+      }
     } else {
-      res.status(400).send({ ok: false, error: 'Invalid Credentials' });
+      res.status(400).send({ ok: false, error: 'User not found' });
     }
   } catch (err) {
-    console.log(err);
+    if (typeof err === 'string') console.log(err);
   }
 });
 
 app.get('/get-rooms', auth, async (req: Request, res: Response) => {
-  const { userId } = req.query;
-
+  const { userID } = req.query;
+  console.log('fetching rooms');
   try {
-    const rooms = await getAllRooms(String(userId));
+    const rooms = await getAllRooms(String(userID));
 
     res.status(200).json(rooms);
   } catch (err) {
@@ -134,7 +98,7 @@ app.post('/new-room', auth, async (req: Request, res: Response) => {
     const addedUserData = await prisma.user.findFirst({
       where: { email: data.email },
       select: {
-        id: true
+        ID: true
       }
     });
 
@@ -144,19 +108,21 @@ app.post('/new-room', auth, async (req: Request, res: Response) => {
         data: {
           roomMembers: {
             create: [
-              { userId: data.userID, timeJoined },
-              { userId: addedUserData.id, timeJoined }
+              { userID: data.userID, timeJoined },
+              { userID: addedUserData.ID, timeJoined }
             ]
           }
         },
         select: {
-          roomId: true,
+          roomID: true,
           roomMembers: {
-            select: { user: { select: { id: true, username: true } } }
+            select: { user: { select: { ID: true, username: true } } }
           }
         }
       });
-      res.status(201).json(newRoom);
+      res.status(201).json({ ok: true, room: newRoom });
+    } else {
+      res.status(204).send({ ok: false, error: 'User not found' });
     }
   } catch (err) {
     console.log(err);
@@ -164,83 +130,46 @@ app.post('/new-room', auth, async (req: Request, res: Response) => {
 });
 
 app.get('/get-message', auth, async (req: Request, res: Response) => {
-  const { roomId, userId } = req.query;
+  const { roomID, userID } = req.query;
 
   try {
-    const message = await prisma.message.findMany({
-      where: {
-        roomId: (roomId as string) || '1',
-        sentBy: { userId: userId as string }
-      },
+    const message = await getMessage(roomID as string, userID as string);
 
-      select: {
-        messageId: true,
-        memberId: false,
-        sentBy: {
-          select: {
-            user: {
-              select: {
-                username: true,
-                id: true
-              }
-            }
-          }
-        },
-        content: true,
-        timeSent: true,
-        roomId: true,
-        seen: true
-      },
-      orderBy: {
-        messageId: 'desc'
-      },
-      take: 1
-    });
-
-    if (!message) throw Error;
-
-    const formattedMessage = {
-      ...message[0],
-      sentBy: {
-        userId: message[0].sentBy.user.id,
-        username: message[0].sentBy.user.username
-      }
-    };
-
-    res.json(formattedMessage);
+    res.status(200).json(message);
   } catch (err) {
     console.log(err);
   }
 });
 
 app.get('/get-messages', auth, async (req: Request, res: Response) => {
-  const { roomId, limit } = req.query;
+  const { roomID, limit } = req.query;
 
+  console.log('fetching messages');
   try {
     const messages = await prisma.message.findMany({
       where: {
-        roomId: (roomId as string) || '1'
+        roomID: (roomID as string) || '1'
       },
 
       select: {
-        messageId: true,
-        memberId: false,
+        messageID: true,
+        memberID: false,
         sentBy: {
           select: {
             user: {
               select: {
                 username: true,
-                id: true
+                ID: true
               }
             }
           }
         },
         content: true,
         timeSent: true,
-        roomId: true,
+        roomID: true,
         seen: true
       },
-      orderBy: { messageId: 'desc' },
+      orderBy: { messageID: 'desc' },
       take: Number(limit) || -1
     });
 
@@ -252,7 +181,7 @@ app.get('/get-messages', auth, async (req: Request, res: Response) => {
       return {
         ...message,
         sentBy: {
-          userId: message.sentBy.user.id,
+          userID: message.sentBy.user.ID,
           username: message.sentBy.user.username
         },
         timeSent: time
@@ -268,14 +197,14 @@ app.get('/get-messages', auth, async (req: Request, res: Response) => {
 io.on('connection', socket => {
   console.log('Made socket connection');
 
-  socket.on('joinRoom', (roomId: string) => {
-    socket.join(roomId);
-    console.log(`user joined room: ${roomId}`);
+  socket.on('joinRoom', (roomID: string) => {
+    socket.join(roomID);
+    console.log(`user joined room: ${roomID}`);
   });
 
-  socket.on('leaveRoom', (roomId: string) => {
-    socket.leave(roomId);
-    console.log(`user left room ${roomId}`);
+  socket.on('leaveRoom', (roomID: string) => {
+    socket.leave(roomID);
+    console.log(`user left room ${roomID}`);
   });
 
   socket.on(
@@ -283,34 +212,34 @@ io.on('connection', socket => {
     async ({
       content,
       sentBy,
-      roomId
+      roomID
     }: {
       content: string;
       sentBy: string;
-      roomId: string;
+      roomID: string;
     }) => {
       try {
         const member = await prisma.roomMember.findFirst({
-          where: { roomId, userId: sentBy }
+          where: { roomID, userID: sentBy }
         });
 
         if (member) {
           const message = await createNewMessage({
             content,
-            roomId,
-            membershipId: member.membershipId
+            roomID,
+            memberID: member.memberID
           });
 
-          socket.in(roomId).emit('message', {
+          socket.in(roomID).emit('message', {
             ...message,
             sentBy: {
-              userId: message.sentBy.user.id,
+              userID: message.sentBy.user.ID,
               username: message.sentBy.user.username
             },
-            roomId
+            roomID
           });
 
-          console.log(`message emitted to: ${message.roomId}`);
+          console.log(`message emitted to: ${message.roomID}`);
         }
       } catch (err) {
         console.log(err);
@@ -320,13 +249,13 @@ io.on('connection', socket => {
 
   socket.on(
     'typing',
-    ({ username, roomId }: { username: string; roomId: string }) => {
-      socket.to(roomId).emit('typing', username);
+    ({ username, roomID }: { username: string; roomID: string }) => {
+      socket.to(roomID).emit('typing', username);
     }
   );
 
-  socket.on('seen', ({ user, roomId }: { user: string; roomId: string }) => {
-    socket.in(roomId).emit('msgSeen', user);
+  socket.on('seen', ({ user, roomID }: { user: string; roomID: string }) => {
+    socket.in(roomID).emit('msgSeen', user);
   });
 
   socket.on('disconnect', () => {

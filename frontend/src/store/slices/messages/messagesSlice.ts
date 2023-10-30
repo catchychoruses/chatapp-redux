@@ -15,9 +15,9 @@ export interface MessagesState {
 
 export const fetchMessages = createAsyncThunk(
   'messages/fetchMessages',
-  async (roomId: string, { rejectWithValue }) => {
+  async (roomID: string, { rejectWithValue }) => {
     const messages = await fetchWithToken<MessageType[]>('/get-messages', {
-      roomId,
+      roomID,
       limit: '10'
     });
 

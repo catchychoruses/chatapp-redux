@@ -1,11 +1,20 @@
-export type LoginAPIResponse = LoginAPISuccess | LoginAPIError;
+import { RoomData } from './store/slices';
+
+export type CreateRoomAPIResponse = CreateRoomAPISuccess | APIResponseError;
+
+interface CreateRoomAPISuccess {
+  ok: true;
+  newRoom: RoomData;
+}
+
+export type LoginAPIResponse = LoginAPISuccess | APIResponseError;
 
 export interface LoginAPISuccess {
   ok: true;
   userData: UserSessionData;
 }
 
-export interface LoginAPIError {
+export interface APIResponseError {
   ok: false;
   error: string;
 }
@@ -15,20 +24,20 @@ export interface UserDataState extends UserSessionData {
 }
 
 export interface UserSessionData {
-  id: string;
+  ID: string;
   username: string;
   email: string;
   token: string;
 }
 
 export interface MessageType {
-  messageId?: string;
+  messageID?: string;
   content: string;
   sentBy: {
-    userId: string;
+    userID: string;
     username: string;
   };
   timeSent: string;
-  roomId: string;
+  roomID: string;
   seen?: boolean;
 }

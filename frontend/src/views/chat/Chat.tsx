@@ -22,9 +22,9 @@ export const Chat = () => {
       }
     }
     if (!currentRoom) {
-      dispatch(fetchRooms(user.id));
+      dispatch(fetchRooms(user.ID));
     }
-  }, [dispatch, user.token, currentRoom, user.id]);
+  }, [dispatch, user.token, currentRoom, user.ID]);
 
   if (!user.authenticated) {
     return <Navigate to="/login" />;

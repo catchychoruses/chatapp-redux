@@ -73,7 +73,7 @@ export const Auth = () => {
                   <input
                     type="email"
                     {...form.register('email', { required: true })}
-                    data-testid="auth-email-field"
+                    data-testID="auth-email-field"
                   />
                 </div>
                 <div className={styles['input-wrapper']}>
@@ -81,7 +81,7 @@ export const Auth = () => {
                   <input
                     type="text"
                     {...form.register('username', { required: true })}
-                    data-testid="auth-username-field"
+                    data-testID="auth-username-field"
                   />
                 </div>
 
@@ -90,7 +90,7 @@ export const Auth = () => {
                   <input
                     type="password"
                     {...form.register('password', { required: true })}
-                    data-testid="auth-password-field"
+                    data-testID="auth-password-field"
                   />
                 </div>
               </div>
@@ -111,7 +111,7 @@ export const Auth = () => {
                   <input
                     type="email"
                     {...form.register('email', { required: true })}
-                    data-testid="auth-email-field"
+                    data-testID="auth-email-field"
                   />
                 </div>
                 <div>
@@ -120,7 +120,7 @@ export const Auth = () => {
                     <input
                       type="password"
                       {...form.register('password', { required: true })}
-                      data-testid="auth-password-field"
+                      data-testID="auth-password-field"
                     />
                   </div>
                 </div>
@@ -132,7 +132,7 @@ export const Auth = () => {
                   )}
                 </div>
               </div>
-              <Button display="Log in" type="submit" data-testid="submit" />
+              <Button display="Log in" type="submit" data-testID="submit" />
             </form>
             <a onClick={() => setRegisterView(true)}>Register</a>
           </>

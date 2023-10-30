@@ -1,34 +1,123 @@
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { prisma } from '../prisma';
 
-export const getAllRooms = async (userId: string) => {
+interface UserData {
+  ID: string;
+  username: string;
+  email: string;
+  password: string;
+  token: string;
+}
+
+type UserWithToken = Omit<UserData, 'password'>;
+
+type UserCreationData = Omit<UserData, 'ID' | 'token'>;
+
+export const createUser = async (userData: UserCreationData) => {
+  const encryptedPassword = await bcrypt.hash(userData.password, 10);
+
+  const user = await prisma.user.create({
+    data: {
+      username: String(userData.username),
+      password: encryptedPassword,
+      token: '',
+      email: userData.email
+    }
+  });
+
+  const token = jwt.sign(
+    { user_ID: user.ID, email: userData.email },
+    process.env.TOKEN_KEY as jwt.Secret,
+    {
+      expiresIn: '2h'
+    }
+  );
+
+  const userWithToken = await prisma.user.update({
+    where: {
+      ID: user.ID
+    },
+    data: {
+      token
+    },
+    select: {
+      password: false,
+      ID: true,
+      username: true,
+      email: true,
+      token: true
+    }
+  });
+
+  return userWithToken;
+};
+
+export const getUser = async (email: string): Promise<UserData | null> => {
+  const user = await prisma.user.findFirst({
+    where: { email }
+  });
+
+  return user;
+};
+
+export const loginUser = async (
+  user: UserData,
+  password: string
+): Promise<UserWithToken | undefined> => {
+  if (await bcrypt.compare(user.password, password)) return undefined;
+
+  const token = jwt.sign(
+    { user_ID: user.ID, email: user.email },
+    process.env.TOKEN_KEY as jwt.Secret,
+    {
+      expiresIn: '2h'
+    }
+  );
+
+  const userWithUpdatedToken = await prisma.user.update({
+    where: { ID: user.ID },
+    data: { token },
+    select: {
+      ID: true,
+      username: true,
+      token: true,
+      email: true
+    }
+  });
+
+  return userWithUpdatedToken;
+};
+
+export const getAllRooms = async (userID: string) => {
   const rooms = await prisma.room.findMany({
     where: {
       roomMembers: {
         some: {
-          userId
+          userID
         }
       }
     },
     select: {
-      roomId: true,
+      roomID: true,
       roomMembers: {
-        select: { user: { select: { id: true, username: true } } }
+        select: { user: { select: { ID: true, username: true } } }
       },
       messages: {
         take: 1,
-        orderBy: { messageId: 'desc' }
+        orderBy: { messageID: 'desc' }
       }
     }
   });
 
   const formattedRes = rooms.map(room => {
     const otherMember = room.roomMembers.filter(
-      member => member.user.id !== userId
+      member => member.user.ID !== userID
     );
     const displayName = otherMember[0].user.username;
 
     return {
-      roomId: room.roomId,
+      roomID: room.roomID,
       members: room.roomMembers,
       displayName,
       lastMsg: {
@@ -42,23 +131,67 @@ export const getAllRooms = async (userId: string) => {
   return formattedRes;
 };
 
+export const getMessage = async (roomID: string, userID: string) => {
+  const message = await prisma.message.findMany({
+    where: {
+      roomID,
+      sentBy: { userID }
+    },
+
+    select: {
+      messageID: true,
+      memberID: false,
+      sentBy: {
+        select: {
+          user: {
+            select: {
+              username: true,
+              ID: true
+            }
+          }
+        }
+      },
+      content: true,
+      timeSent: true,
+      roomID: true,
+      seen: true
+    },
+    orderBy: {
+      messageID: 'desc'
+    },
+    take: 1
+  });
+
+  if (!message) return undefined;
+
+  const formattedMessage = {
+    ...message[0],
+    sentBy: {
+      userID: message[0].sentBy.user.ID,
+      username: message[0].sentBy.user.username
+    }
+  };
+
+  return formattedMessage;
+};
+
 export const createNewMessage = async ({
   content,
-  roomId,
-  membershipId
+  roomID,
+  memberID
 }: {
   content: string;
-  roomId: string;
-  membershipId: number;
+  roomID: string;
+  memberID: number;
 }) => {
-  const time = new Date().toISOString();
+  const timeSent = new Date().toISOString();
 
   const message = await prisma.message.create({
     data: {
       content,
-      roomId,
-      timeSent: time,
-      memberId: membershipId
+      roomID,
+      timeSent,
+      memberID
     },
 
     include: {
@@ -67,7 +200,7 @@ export const createNewMessage = async ({
           user: {
             select: {
               username: true,
-              id: true
+              ID: true
             }
           }
         }

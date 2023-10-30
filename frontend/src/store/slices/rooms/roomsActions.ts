@@ -2,49 +2,67 @@ import { fetchWithToken } from '@/api/fetchApi';
 import { RootState } from '@/store/store';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { RoomData, setCurrentRoom } from './roomsSlice';
+import { CreateRoomAPIResponse } from '@/types';
 
 export const fetchRooms = createAsyncThunk<
   RoomData[],
   string,
   { state: RootState }
->('rooms/fetchRooms', async (userId: string, { rejectWithValue, getState }) => {
+>('rooms/fetchRooms', async (userID: string, { rejectWithValue, getState }) => {
   const currentRoom = getState().rooms.currentRoom;
 
+  const t1 = performance.now();
+
   const roomsData = await fetchWithToken<RoomData[]>('/get-rooms', {
-    userId
+    userID
   });
 
   if (!roomsData) return rejectWithValue('Could not get rooms data');
 
-  if (!currentRoom.id) {
+  if (!currentRoom.ID) {
     sessionStorage.setItem(
       'currentRoom',
       JSON.stringify({
-        id: roomsData[0].roomId,
+        ID: roomsData[0].roomID,
         displayName: roomsData[0].displayName
       })
     );
   }
+  const t2 = performance.now();
+  console.log(`fetching rooms: ${t2 - t1}`);
+
   return roomsData;
 });
 
-export const newRoom = createAsyncThunk<RoomData, string, { state: RootState }>(
+export const newRoom = createAsyncThunk<
+  RoomData,
+  string,
+  { state: RootState; rejectValue: string }
+>(
   'rooms/newRoom',
   async (email: string, { rejectWithValue, getState, dispatch }) => {
     const { auth } = getState();
 
-    const newRoom = await fetchWithToken<RoomData>('/new-room', undefined, {
-      userID: auth.userData.id,
-      email
-    });
+    const response = await fetchWithToken<CreateRoomAPIResponse>(
+      '/new-room',
+      undefined,
+      {
+        userID: auth.userData.ID,
+        email
+      }
+    );
 
-    if (!newRoom) return rejectWithValue('Failed to create chatroom');
+    if (!response) return rejectWithValue('Failed to create chatroom');
+    if (!response.ok) return rejectWithValue(response.error);
 
     dispatch(
       setCurrentRoom({
-        nextRoom: { id: newRoom.roomId, displayName: newRoom.displayName }
+        nextRoom: {
+          ID: response.newRoom.roomID,
+          displayName: response.newRoom.displayName
+        }
       })
     );
-    return newRoom;
+    return response.newRoom;
   }
 );

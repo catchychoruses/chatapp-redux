@@ -5,19 +5,20 @@ import { getSessionStorage } from '@/utils';
 
 export interface RoomsState {
   currentRoom: {
-    id: string;
+    ID: string;
     displayName: string;
   };
   rooms: RoomData[];
-  allRoomIds: string[];
+  allRoomIDs: string[];
   loading: boolean;
+  createRoomError: string;
 }
 
 export interface RoomData {
-  roomId: string;
+  roomID: string;
   displayName: string;
   members: {
-    id: string;
+    ID: string;
     username: string;
   }[];
   lastMsg: {
@@ -27,15 +28,16 @@ export interface RoomData {
   } | null;
 }
 
-const sessionRoom = getSessionStorage<{ id: string; displayName: string }>(
+const sessionRoom = getSessionStorage<{ ID: string; displayName: string }>(
   'currentRoom'
 );
 
 const initialState: RoomsState = {
-  currentRoom: sessionRoom || { id: '', displayName: '' },
+  currentRoom: sessionRoom || { ID: '', displayName: '' },
   rooms: [],
-  allRoomIds: [],
-  loading: false
+  allRoomIDs: [],
+  loading: false,
+  createRoomError: ''
 };
 
 const roomsSlice = createSlice({
@@ -51,11 +53,11 @@ const roomsSlice = createSlice({
       {
         payload
       }: PayloadAction<{
-        prevRoomId?: string;
-        nextRoom: { id: string; displayName: string };
+        prevRoomID?: string;
+        nextRoom: { ID: string; displayName: string };
       }>
     ) {
-      state.currentRoom.id = payload.nextRoom.id;
+      state.currentRoom.ID = payload.nextRoom.ID;
       state.currentRoom.displayName = payload.nextRoom.displayName;
     }
   },
@@ -67,20 +69,24 @@ const roomsSlice = createSlice({
         state.loading = false;
         state.rooms = payload;
 
-        if (!state.currentRoom.id) {
-          state.currentRoom.id = payload[0].roomId;
+        if (!state.currentRoom.ID) {
+          state.currentRoom.ID = payload[0].roomID;
           state.currentRoom.displayName = payload[0].displayName;
         }
 
-        state.allRoomIds = payload.map((room) => room.roomId);
+        state.allRoomIDs = payload.map((room) => room.roomID);
       });
 
     builder.addCase(newRoom.fulfilled, (state, { payload }) => {
       state.loading = false;
       state.rooms = [...state.rooms, payload];
 
-      state.currentRoom.id = payload.roomId;
+      state.currentRoom.ID = payload.roomID;
       state.currentRoom.displayName = payload.displayName;
+    });
+    builder.addCase(newRoom.rejected, (state, action) => {
+      state.loading = false;
+      state.createRoomError = action.payload || '';
     });
   }
 });
@@ -89,5 +95,7 @@ export const { getRooms, setCurrentRoom } = roomsSlice.actions;
 
 export const selectRooms = (state: RootState) => state.rooms.rooms;
 export const selectCurrentRoom = (state: RootState) => state.rooms.currentRoom;
+export const selectCreateRoomError = (state: RootState) =>
+  state.rooms.createRoomError;
 
 export default roomsSlice.reducer;

@@ -6,10 +6,10 @@ import { useContext } from 'react';
 
 interface MessageProps {
   message: MessageType;
-  currentUserId: string;
+  currentUserID: string;
 }
 
-export const Message = ({ message, currentUserId }: MessageProps) => {
+export const Message = ({ message, currentUserID }: MessageProps) => {
   const { theme } = useContext(ThemeContext);
 
   return (
@@ -17,14 +17,14 @@ export const Message = ({ message, currentUserId }: MessageProps) => {
       <div
         className={clsx({
           [styles.message]: true,
-          [styles.own]: message.sentBy.userId === currentUserId
+          [styles.own]: message.sentBy.userID === currentUserID
         })}
       >
         <span className={styles.username}>{message.sentBy.username}</span>
         <div
           className={clsx({
             [styles['msg-inner']]: true,
-            [styles.own]: message.sentBy.userId === currentUserId,
+            [styles.own]: message.sentBy.userID === currentUserID,
             [styles[`${theme}-theme`]]: true
           })}
         >
