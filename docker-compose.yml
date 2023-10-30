@@ -10,6 +10,13 @@ services:
       - "3000:3000"
     networks:
       - chatapp
+    entrypoint:
+      [
+        "ash",
+        "-c",
+        "npx prisma db push && npx prisma db seed && cd dist && npm run start",
+      ]
+
   frontend:
     hostname: frontend
     container_name: frontend

@@ -1,0 +1,32 @@
+{
+  "name": "chatapp-redux",
+  "version": "1.0.0",
+  "description": "Fullstack PWA built with React Redux and Socket.io.",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "prepare": "husky install",
+    "lint": "npm run lint --workspaces",
+    "lint-fix": "npm run lint-fix --workspaces",
+    "stylelint": "npm run stylelint --workspace=@chatapp-redux/frontend",
+    "stylelint-fix": "npm run stylelint-fix ---workspace=@chatapp-redux/frontend",
+    "build": "npm run build ---workspaces",
+    "dev": "conc 'npm:dev --workspace=@chatapp-redux/backend' 'npm:dev --workspace=@chatapp-redux/frontend'",
+    "dockerize": "docker-compose up -d --build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/catchychoruses/chatapp-redux.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/catchychoruses/chatapp-redux/issues"
+  },
+  "homepage": "https://github.com/catchychoruses/chatapp-redux#readme",
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

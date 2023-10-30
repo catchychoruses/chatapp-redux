@@ -1,14 +1,16 @@
 {
-  "name": "chatapp-redux",
+  "name": "@chatapp-redux/frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "lint": "eslint ./src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "lint-fix": "eslint ./src --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
-    "preview": "vite preview"
+    "lint": "eslint -c .eslintrc.json src --ext ts,tsx --report-unused-disable-directives --max-warnings=0",
+    "lint-fix": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings=0 --fix",
+    "preview": "vite preview",
+    "stylelint": "stylelint **/*.scss",
+    "stylelint-fix": "stylelint **/*.scss --fix"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",

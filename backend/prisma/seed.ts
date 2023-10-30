@@ -7,15 +7,15 @@ const prisma = new PrismaClient();
 
 async function main() {
   const users = [
-    { email: 'user@user.com', username: 'user' },
-    { email: 'user2@user.com', username: 'user2' },
-    { email: 'user3@user.com', username: 'user3' }
-  ].map(async ({ email, username }) => {
+    { email: 'user@user.com', username: 'user', ID: '1' },
+    { email: 'user2@user.com', username: 'user2', ID: '2' },
+    { email: 'user3@user.com', username: 'user3', ID: '3' }
+  ].map(async ({ email, username, ID }) => {
     const password = await bcrypt.hash(username, 10);
 
     const user = await prisma.user.upsert({
       where: {
-        ID: randomUUID()
+        ID
       },
       update: {},
       create: {
