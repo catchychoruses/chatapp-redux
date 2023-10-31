@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { randomUUID } from 'crypto';
 import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
@@ -13,12 +12,13 @@ async function main() {
   ].map(async ({ email, username, ID }) => {
     const password = await bcrypt.hash(username, 10);
 
-    const user = await prisma.user.upsert({
+    const user = await prisma.chatUser.upsert({
       where: {
         ID
       },
       update: {},
       create: {
+        ID,
         email,
         username,
         password,
@@ -34,7 +34,7 @@ async function main() {
       }
     );
 
-    const completeUser = await prisma.user.update({
+    const completeUser = await prisma.chatUser.update({
       where: {
         ID: user.ID
       },
@@ -47,8 +47,13 @@ async function main() {
   });
 
   const timeJoined = new Date().toISOString();
-  await prisma.room.create({
-    data: {
+  await prisma.room.upsert({
+    where: {
+      roomID: '1'
+    },
+    update: {},
+    create: {
+      roomID: '1',
       roomMembers: {
         create: [
           { userID: (await users[0]).ID, timeJoined },

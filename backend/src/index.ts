@@ -39,7 +39,7 @@ app.post('/register', async (req: Request, res: Response) => {
   const userData: { email: string; username: string; password: string } =
     req.body;
 
-  const existingUser = await prisma.user.findFirst({
+  const existingUser = await prisma.chatUser.findFirst({
     where: { email: userData.email }
   });
 
@@ -95,7 +95,7 @@ app.post('/new-room', auth, async (req: Request, res: Response) => {
   try {
     const data: { userID: string; email: string } = req.body;
 
-    const addedUserData = await prisma.user.findFirst({
+    const addedUserData = await prisma.chatUser.findFirst({
       where: { email: data.email },
       select: {
         ID: true

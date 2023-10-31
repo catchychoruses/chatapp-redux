@@ -11,8 +11,6 @@ export const fetchRooms = createAsyncThunk<
 >('rooms/fetchRooms', async (userID: string, { rejectWithValue, getState }) => {
   const currentRoom = getState().rooms.currentRoom;
 
-  const t1 = performance.now();
-
   const roomsData = await fetchWithToken<RoomData[]>('/get-rooms', {
     userID
   });
@@ -28,8 +26,6 @@ export const fetchRooms = createAsyncThunk<
       })
     );
   }
-  const t2 = performance.now();
-  console.log(`fetching rooms: ${t2 - t1}`);
 
   return roomsData;
 });

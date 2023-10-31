@@ -30,8 +30,9 @@ export const ChatWindow = () => {
   const { emitMessage, emitTyping, userTyping } = useContext(SocketContext);
 
   const handleInput = (input: string) => {
+    if (input.length > msgInput.length) emitTyping();
+
     setMsgInput(input);
-    emitTyping();
   };
 
   const handleSendMessage = (content: string) => {

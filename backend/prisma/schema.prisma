@@ -1,45 +1,55 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+  schemas   = ["chatapp"]
 }
 
-model User {
+model ChatUser {
   ID         String       @id @default(uuid())
   username   String
   email      String
   password   String
-  roomMember RoomMember[]
   token      String
+  roomMember RoomMember[]
+
+  @@schema("chatapp")
 }
 
 model RoomMember {
-  memberID      Int @id  @unique @default(autoincrement())
-  user       User      @relation(fields: [userID], references: [ID])
-  userID     String    
-  room       Room      @relation(fields: [roomID], references: [roomID])
+  memberID   Int       @id @unique @default(autoincrement())
+  userID     String
   roomID     String
   timeJoined DateTime
   messages   Message[]
+  room       Room      @relation(fields: [roomID], references: [roomID])
+  user       ChatUser  @relation(fields: [userID], references: [ID])
+
+  @@schema("chatapp")
 }
 
 model Room {
   roomID      String       @id @unique @default(uuid())
-  roomMembers RoomMember[]
   messages    Message[]
+  roomMembers RoomMember[]
+
+  @@schema("chatapp")
 }
 
 model Message {
   messageID Int        @id @unique @default(autoincrement())
-  sentBy    RoomMember @relation(fields: [memberID], references: [memberID])
   memberID  Int
   content   String
   timeSent  DateTime
-  room      Room       @relation(fields: [roomID], references: [roomID])
   roomID    String
   seen      Boolean?
-}
+  sentBy    RoomMember @relation(fields: [memberID], references: [memberID])
+  room      Room       @relation(fields: [roomID], references: [roomID])
 
+  @@schema("chatapp")
+}

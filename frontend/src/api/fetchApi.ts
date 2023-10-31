@@ -14,7 +14,10 @@ export async function fetchWithToken<T = void>(
       const data = await fetch(
         body
           ? import.meta.env.VITE_BACKEND_API_URL + URL
-          : 'http://192.168.0.38:3000' + URL + '?' + searchParams.toString(),
+          : import.meta.env.VITE_BACKEND_API_URL +
+              URL +
+              '?' +
+              searchParams.toString(),
         {
           method: body ? 'POST' : 'GET',
           headers: {
