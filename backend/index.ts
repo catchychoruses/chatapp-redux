@@ -3,8 +3,8 @@ import express, { Express, Request, Response } from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
-import { prisma } from '../prisma';
-import auth from './middleware/auth';
+import { prisma } from './prisma';
+import auth from './src/middleware/auth';
 
 import {
   createNewMessage,
@@ -13,7 +13,7 @@ import {
   getMessage,
   getUser,
   loginUser
-} from './queries';
+} from './src/queries';
 
 const PORT = 3000;
 
