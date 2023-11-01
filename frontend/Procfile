@@ -1,1 +1,1 @@
-web: cd frontend && npx serve dist
+web: npm i -g serve && npx serve dist -p $PORT

@@ -1,1 +1,1 @@
-web: cd backend/api && node  --trace-warnings --experimental-specifier-resolution=node --import=./src/register.js --import=./src/logError.js index.js
+web: cd api && node  --trace-warnings --experimental-specifier-resolution=node --import=./src/register.js --import=./src/logError.js index.js

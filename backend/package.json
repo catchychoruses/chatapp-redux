@@ -8,7 +8,7 @@
     "seed": "tsx prisma/seed.ts"
   },
   "scripts": {
-    "build": " npx prisma generate && npx prisma db push && npx prisma db seed && npx tsc",
+    "build": "npx prisma generate && npx prisma db push && npx prisma db seed && npx tsc",
     "start": "nodemon - exec 'ts-node' api/index.js",
     "dev": "nodemon - exec 'ts-node' index.ts",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings=0",
