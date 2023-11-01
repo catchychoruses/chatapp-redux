@@ -7,7 +7,6 @@
     "frontend"
   ],
   "scripts": {
-    "build": "npm run build ---workspaces",
     "lint": "npm run lint --workspaces",
     "lint-fix": "npm run lint-fix --workspaces",
     "stylelint": "npm run stylelint --workspace=@chatapp-redux/frontend",
