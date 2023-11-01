@@ -16,8 +16,8 @@
     "dev": "conc 'npm:dev --workspace=@chatapp-redux/backend' 'npm:dev --workspace=@chatapp-redux/frontend'",
     "dockerize": "docker-compose up -d --build",
     "postinstall": "if [ $CLIENT_ENV ]; then npm run postinstall-client; elif [ $SERVER_ENV ]; then npm run postinstall-server; else echo no environment detected, please set CLIENT_ENV or SERVER_ENV; fi",
-    "postinstall-client": "cd frontend && npm install --omit-dev && npm i -g serve && npm run build",
-    "postinstall-server": "cd backend && npm install --omit-dev && npm run build"
+    "postinstall-client": "cd frontend && npm install --omit-dev --workspace=@chatapp-redux/frontend && npm i -g serve --workspace=@chatapp-redux/frontend && npm run build --workspace=@chatapp-redux/frontend",
+    "postinstall-server": "cd backend && npm install --omit-dev --workspace=@chatapp-redux/backend && npm run build --workspace=@chatapp-redux/backend"
   },
   "repository": {
     "type": "git",
