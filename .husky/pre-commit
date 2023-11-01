@@ -3,4 +3,3 @@
 
 npm run lint
 npm run stylelint --workspace=@chatapp-redux/frontend
-npm run build
