@@ -7,13 +7,12 @@
     "frontend"
   ],
   "scripts": {
-    "deploy": "npm run build && conc 'npm:start --workspace=@chatapp-redux/backend' 'npx serve dist --workspace=@chatapp-redux/frontend'",
+    "build": "npm run build ---workspaces",
     "prepare": "husky install",
     "lint": "npm run lint --workspaces",
     "lint-fix": "npm run lint-fix --workspaces",
     "stylelint": "npm run stylelint --workspace=@chatapp-redux/frontend",
     "stylelint-fix": "npm run stylelint-fix ---workspace=@chatapp-redux/frontend",
-    "build": "npm run build ---workspaces",
     "dev": "conc 'npm:dev --workspace=@chatapp-redux/backend' 'npm:dev --workspace=@chatapp-redux/frontend'",
     "dockerize": "docker-compose up -d --build"
   },
