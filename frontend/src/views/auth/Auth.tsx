@@ -34,7 +34,7 @@ export const Auth = () => {
 
   useEffect(() => {
     if (user?.authenticated) {
-      navigate('/');
+      navigate(window.innerWidth <= 425 ? '/chat-list' : '/');
     }
   }, [navigate, user]);
 

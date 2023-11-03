@@ -69,7 +69,7 @@ export const ChatList = () => {
       className={clsx({
         [styles['chat-list']]: true,
         [styles[`${theme}-theme`]]: true,
-        [styles.hIDden]: location.pathname === '/',
+        [styles.hidden]: location.pathname === '/',
         [styles.browser]: location.pathname === '/'
       })}
     >
