@@ -18,7 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.3.1",
+    "@prisma/client": "^5.5.2",
     "@types/cors": "^2.8.14",
     "@types/express-serve-static-core": "^4.17.37",
     "bcryptjs": "^2.4.3",
