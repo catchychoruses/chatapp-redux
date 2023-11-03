@@ -12,7 +12,7 @@ async function main() {
   ].map(async ({ email, username, ID }) => {
     const password = await bcrypt.hash(username, 10);
 
-    const user = await prisma.chatUser.upsert({
+    const user = await prisma.user.upsert({
       where: {
         ID
       },
@@ -34,7 +34,7 @@ async function main() {
       }
     );
 
-    const completeUser = await prisma.chatUser.update({
+    const completeUser = await prisma.user.update({
       where: {
         ID: user.ID
       },

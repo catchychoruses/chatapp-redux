@@ -1,0 +1,28 @@
+@import '../../../global';
+
+.input {
+  min-height: 2rem;
+  outline: none;
+  margin: 0.5rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+
+  border-radius: 15px;
+
+  font-family: inherit;
+
+  &:after {
+    display: none;
+  }
+}
+@include themify($themes) {
+  &.input {
+    background-color: themed('secondary');
+    color: themed('font-color');
+    border: 1.5px solid themed('border');
+
+    &:focus {
+      outline: 1.5px solid themed('secondary');
+    }
+  }
+}

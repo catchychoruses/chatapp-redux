@@ -17,7 +17,7 @@ type UserCreationData = Omit<UserData, 'ID' | 'token'>;
 export const createUser = async (userData: UserCreationData) => {
   const encryptedPassword = await bcrypt.hash(userData.password, 10);
 
-  const user = await prisma.chatUser.create({
+  const user = await prisma.user.create({
     data: {
       username: String(userData.username),
       password: encryptedPassword,
@@ -34,7 +34,7 @@ export const createUser = async (userData: UserCreationData) => {
     }
   );
 
-  const userWithToken = await prisma.chatUser.update({
+  const userWithToken = await prisma.user.update({
     where: {
       ID: user.ID
     },
@@ -54,7 +54,7 @@ export const createUser = async (userData: UserCreationData) => {
 };
 
 export const getUser = async (email: string): Promise<UserData | null> => {
-  const user = await prisma.chatUser.findFirst({
+  const user = await prisma.user.findFirst({
     where: { email }
   });
 
@@ -75,7 +75,7 @@ export const loginUser = async (
     }
   );
 
-  const userWithUpdatedToken = await prisma.chatUser.update({
+  const userWithUpdatedToken = await prisma.user.update({
     where: { ID: user.ID },
     data: { token },
     select: {

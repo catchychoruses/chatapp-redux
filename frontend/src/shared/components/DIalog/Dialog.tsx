@@ -4,8 +4,13 @@ import { ThemeContext } from '@/context/theme/themeContext';
 import clsx from 'clsx';
 import { Button } from '../Button';
 import { X } from 'lucide-react';
-import { useAppDispatch } from '@/store/reduxHelpers';
-import { newRoom } from '@/store/slices/rooms';
+import { useAppDispatch, useAppSelector } from '@/store/reduxHelpers';
+import {
+  fetchRooms,
+  newRoom,
+  selectCreateRoomError
+} from '@/store/slices/rooms';
+import { Input } from '../Input';
 
 interface DialogProps {
   isOpen: boolean;
@@ -19,6 +24,8 @@ export const NewRoomDialog = ({ isOpen, setIsOpen }: DialogProps) => {
   const ref = useRef<HTMLDialogElement>(null);
   const { theme } = useContext(ThemeContext);
 
+  const error = useAppSelector(selectCreateRoomError);
+
   const [modalClosing, setModalClosing] = useState(false);
 
   const [emailInput, setEmailInput] = useState('');
@@ -28,17 +35,24 @@ export const NewRoomDialog = ({ isOpen, setIsOpen }: DialogProps) => {
       setModalClosing(false);
       ref.current?.showModal();
     } else {
+      setEmailInput('');
       ref.current?.close();
     }
-  }, [isOpen]);
+  }, [isOpen, error]);
 
   const handleCreate = () => {
-    dispatch(newRoom(emailInput));
-    setModalClosing(true);
-    setTimeout(() => {
-      ref.current?.close();
-      setIsOpen(false);
-    }, 100);
+    if (emailInput) {
+      dispatch(newRoom(emailInput)).then((action) => {
+        if (action.meta.requestStatus === 'fulfilled') {
+          setModalClosing(true);
+          setTimeout(() => {
+            ref.current?.close();
+            setIsOpen(false);
+          }, 100);
+          dispatch(fetchRooms(null));
+        }
+      });
+    }
   };
   return (
     <dialog ref={ref} className={styles['dialog-outer']}>
@@ -64,16 +78,23 @@ export const NewRoomDialog = ({ isOpen, setIsOpen }: DialogProps) => {
 
         <header className={styles.header}>New Chat</header>
 
-        <div className={styles['form-container']}>
+        <form
+          className={styles['form-container']}
+          onSubmit={(e) => {
+            e.preventDefault(), handleCreate();
+          }}
+        >
           <label htmlFor="email">User Email:</label>
-          <input
+          <Input
             type="email"
             name="email"
             value={emailInput}
             onChange={(e) => setEmailInput(e.target.value)}
+            autoFocus
           />
-        </div>
-        <Button display="Create" onClick={handleCreate} />
+          <Button display="Create" type="submit" />
+        </form>
+        <p>{error ?? error}</p>
       </div>
     </dialog>
   );

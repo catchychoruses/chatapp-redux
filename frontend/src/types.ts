@@ -4,7 +4,7 @@ export type CreateRoomAPIResponse = CreateRoomAPISuccess | APIResponseError;
 
 interface CreateRoomAPISuccess {
   ok: true;
-  newRoom: RoomData;
+  room: RoomData;
 }
 
 export type LoginAPIResponse = LoginAPISuccess | APIResponseError;

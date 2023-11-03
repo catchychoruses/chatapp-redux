@@ -20,7 +20,7 @@
     /* Completeness */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
-  "include": ["/**/*.ts"],
+  "include": ["/**/*.ts", "src/register.js", "src/logError.js"],
   "exclude": ["node_modules"],
   "ts-node": {
     "esm": true,

@@ -4,7 +4,6 @@ import {
   fetchMessages,
   receiveMessage,
   selectCurrentRoom,
-  selectRooms,
   selectUserData,
   setCurrentRoom
 } from '@/store/slices';
@@ -19,7 +18,6 @@ export const useWebSocket = () => {
 
   const user = useAppSelector(selectUserData);
   const currentRoom = useAppSelector(selectCurrentRoom);
-  const rooms = useAppSelector(selectRooms);
   const [userTyping, setUserTyping] = useState<string | null>(null);
 
   const [socket] = useState(() =>
@@ -47,7 +45,7 @@ export const useWebSocket = () => {
     roomID: string;
   }) => {
     socket.emit('message', message);
-    setTimeout(() => appDispatch(fetchRooms(user.ID)), 2000);
+    setTimeout(() => appDispatch(fetchRooms(user.ID)), 500);
   };
 
   const emitTyping = throttle(() => {
@@ -55,11 +53,11 @@ export const useWebSocket = () => {
   }, 5000);
 
   useEffect(() => {
-    if (rooms.length) {
+    if (currentRoom) {
       socket.emit('joinRoom', currentRoom.ID);
       appDispatch(fetchMessages(currentRoom.ID));
     }
-  }, [rooms, currentRoom, appDispatch, socket]);
+  }, [currentRoom, appDispatch, socket]);
 
   useEffect(() => {
     const unsubscribe = appDispatch(

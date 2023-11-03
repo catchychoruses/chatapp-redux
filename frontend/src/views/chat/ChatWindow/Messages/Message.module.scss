@@ -21,10 +21,6 @@
       min-width: 6rem;
       position: relative;
       z-index: 1;
-      box-shadow:
-        0 0 15px rgb(0 0 0 / 10%),
-        0 0 0 1px rgb(0 0 0 / 5%),
-        0 0 0 1px rgb(0 0 0 / 50%);
       border-radius: 15px;
       width: 100%;
       display: flex;
@@ -55,6 +51,10 @@
 
     &.own {
       background-color: themed('primary');
+    }
+
+    &.msg-inner {
+      outline: 1.5px solid themed('border');
     }
   }
 }

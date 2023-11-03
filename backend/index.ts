@@ -39,7 +39,7 @@ app.post('/register', async (req: Request, res: Response) => {
   const userData: { email: string; username: string; password: string } =
     req.body;
 
-  const existingUser = await prisma.chatUser.findFirst({
+  const existingUser = await prisma.user.findFirst({
     where: { email: userData.email }
   });
 
@@ -95,7 +95,7 @@ app.post('/new-room', auth, async (req: Request, res: Response) => {
   try {
     const data: { userID: string; email: string } = req.body;
 
-    const addedUserData = await prisma.chatUser.findFirst({
+    const addedUserData = await prisma.user.findFirst({
       where: { email: data.email },
       select: {
         ID: true
@@ -103,26 +103,49 @@ app.post('/new-room', auth, async (req: Request, res: Response) => {
     });
 
     if (addedUserData) {
-      const timeJoined = new Date().toISOString();
-      const newRoom = await prisma.room.create({
-        data: {
+      const emailInRooms = await prisma.room.findMany({
+        where: {
           roomMembers: {
-            create: [
-              { userID: data.userID, timeJoined },
-              { userID: addedUserData.ID, timeJoined }
-            ]
-          }
-        },
-        select: {
-          roomID: true,
-          roomMembers: {
-            select: { user: { select: { ID: true, username: true } } }
+            some: {
+              userID: data.userID
+            }
+          },
+          AND: {
+            roomMembers: {
+              some: {
+                user: {
+                  email: data.email
+                }
+              }
+            }
           }
         }
       });
-      res.status(201).json({ ok: true, room: newRoom });
+
+      if (!emailInRooms.length) {
+        const timeJoined = new Date().toISOString();
+        const newRoom = await prisma.room.create({
+          data: {
+            roomMembers: {
+              create: [
+                { userID: data.userID, timeJoined },
+                { userID: addedUserData.ID, timeJoined }
+              ]
+            }
+          },
+          select: {
+            roomID: true,
+            roomMembers: {
+              select: { user: { select: { ID: true, username: true } } }
+            }
+          }
+        });
+        res.status(201).json({ ok: true, room: newRoom });
+      } else {
+        res.status(200).json({ ok: false, error: 'Chatroom already exists' });
+      }
     } else {
-      res.status(204).send({ ok: false, error: 'User not found' });
+      res.status(200).send({ ok: false, error: 'User not found' });
     }
   } catch (err) {
     console.log(err);

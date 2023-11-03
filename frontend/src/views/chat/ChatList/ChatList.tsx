@@ -16,7 +16,7 @@ import { logoutAPI } from '@/store/slices/auth';
 import { useLocation, useNavigate } from 'react-router';
 import { fetchRooms } from '@/store/slices/rooms';
 import { SocketContext } from '@/context/socket';
-import { NewRoomDialog } from '@/shared/components/DIalog';
+import { NewRoomDialog } from '@/shared/components/Dialog';
 
 export const ChatList = () => {
   const dispatch = useAppDispatch();

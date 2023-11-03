@@ -1,15 +1,13 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  schemas   = ["chatapp"]
 }
 
-model ChatUser {
+model User {
   ID         String       @id @default(uuid())
   username   String
   email      String
@@ -17,7 +15,6 @@ model ChatUser {
   token      String
   roomMember RoomMember[]
 
-  @@schema("chatapp")
 }
 
 model RoomMember {
@@ -27,9 +24,8 @@ model RoomMember {
   timeJoined DateTime
   messages   Message[]
   room       Room      @relation(fields: [roomID], references: [roomID])
-  user       ChatUser  @relation(fields: [userID], references: [ID])
+  user       User  @relation(fields: [userID], references: [ID])
 
-  @@schema("chatapp")
 }
 
 model Room {
@@ -37,7 +33,6 @@ model Room {
   messages    Message[]
   roomMembers RoomMember[]
 
-  @@schema("chatapp")
 }
 
 model Message {
@@ -50,5 +45,4 @@ model Message {
   sentBy    RoomMember @relation(fields: [memberID], references: [memberID])
   room      Room       @relation(fields: [roomID], references: [roomID])
 
-  @@schema("chatapp")
 }

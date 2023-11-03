@@ -13,8 +13,6 @@ type MessagesProps = {
 
 export const Messages = memo(
   ({ messages, loading, userID, userTyping }: MessagesProps) => {
-    console.log('rerendered messages');
-
     return (
       <div className={styles.messages}>
         <div

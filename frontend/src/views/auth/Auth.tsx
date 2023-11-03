@@ -11,7 +11,7 @@ import {
 import { useNavigate } from 'react-router';
 import { useAppDispatch, useAppSelector } from '@/store/reduxHelpers';
 import { registerAPI, loginAPI } from '@/store/slices/auth/authActions';
-import { Button } from '@/shared/components/Button';
+import { Button, Input } from '@/shared/components';
 import { ThemeContext } from '@/context/theme/themeContext';
 import clsx from 'clsx';
 
@@ -70,27 +70,24 @@ export const Auth = () => {
               <div className={styles.inputs}>
                 <div className={styles['input-wrapper']}>
                   <label htmlFor="email">Email:</label>
-                  <input
+                  <Input
                     type="email"
                     {...form.register('email', { required: true })}
-                    data-testID="auth-email-field"
                   />
                 </div>
                 <div className={styles['input-wrapper']}>
                   <label htmlFor="username">Username:</label>
-                  <input
+                  <Input
                     type="text"
                     {...form.register('username', { required: true })}
-                    data-testID="auth-username-field"
                   />
                 </div>
 
                 <div className={styles['input-wrapper']}>
                   <label htmlFor="password">Password:</label>
-                  <input
+                  <Input
                     type="password"
                     {...form.register('password', { required: true })}
-                    data-testID="auth-password-field"
                   />
                 </div>
               </div>
@@ -108,19 +105,17 @@ export const Auth = () => {
               <div className={styles.inputs}>
                 <div className={styles['input-wrapper']}>
                   <label htmlFor="email">Email:</label>
-                  <input
+                  <Input
                     type="email"
                     {...form.register('email', { required: true })}
-                    data-testID="auth-email-field"
                   />
                 </div>
                 <div>
                   <div className={styles['input-wrapper']}>
                     <label htmlFor="password">Password:</label>
-                    <input
+                    <Input
                       type="password"
                       {...form.register('password', { required: true })}
-                      data-testID="auth-password-field"
                     />
                   </div>
                 </div>
@@ -132,7 +127,7 @@ export const Auth = () => {
                   )}
                 </div>
               </div>
-              <Button display="Log in" type="submit" data-testID="submit" />
+              <Button display="Login" type="submit" />
             </form>
             <a onClick={() => setRegisterView(true)}>Register</a>
           </>

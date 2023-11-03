@@ -1,73 +1,67 @@
 $themes: (
-    dark: (
-        background: #140721,
-        foreground: #30323d,
-        font-color: #fffaf6,
-        primary: #15457c,
-        secondary: #49132c,
-        warning: #bb4430
-    ),
-    light: (
-        background: #fffaf6,
-        foreground: #cfe0f2,
-        font-color: #140721,
-        primary: #94bbe9,
-        secondary: #eeaeca,
-        warning: #bb4430
-    )
+  dark: (
+    background: #140721,
+    foreground: #30323d,
+    font-color: #fffaf6,
+    primary: #15457c,
+    secondary: #49132c,
+    warning: #bb4430,
+    border: #fff9f525
+  ),
+  light: (
+    background: #fffaf6,
+    foreground: #cfe0f2,
+    font-color: #140721,
+    primary: #94bbe9,
+    secondary: #eeaeca,
+    warning: #bb4430,
+    border: #14072280
+  )
 );
 
 @mixin themify($themes) {
-    @each $name, $values in $themes {
-        .#{$name}-theme {
-            $theme-map: $values !global;
-            @content;
-        }
+  @each $name, $values in $themes {
+    .#{$name}-theme {
+      $theme-map: $values !global;
+      @content;
     }
+  }
 }
 
 @function themed($key) {
-    @return map-get($theme-map, $key);
+  @return map-get($theme-map, $key);
 }
 
 @mixin container-style {
-    position: relative;
-    z-index: 1;
-    box-shadow:
-        0 40px 60px rgb(0 0 0 / 20%),
-        0 20px 15px rgb(0 0 0 / 10%),
-        0 0 0 1px rgb(0 0 0 / 5%),
-        0 0 0 1px rgb(0 0 0 / 50%);
+  position: relative;
+  z-index: 1;
+  box-shadow:
+    0 40px 60px rgb(0 0 0 / 20%),
+    0 20px 15px rgb(0 0 0 / 10%),
+    0 0 0 1px rgb(0 0 0 / 5%),
+    0 0 0 1px rgb(0 0 0 / 50%);
+  border-radius: 10px;
+
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-shadow: inset 0 0 0 1px rgb(56 43 43);
     border-radius: 10px;
-
-    &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        box-shadow: inset 0 0 0 1px rgb(56 43 43);
-        border-radius: 10px;
-        z-index: 999999;
-        pointer-events: none;
-    }
-}
-
-input {
-    min-height: 2rem;
-    border: 2px solid black;
-    outline: none;
-    margin: 0.5rem;
-    padding: 0.5rem;
+    z-index: 999999;
+    pointer-events: none;
+  }
 }
 
 ::-webkit-scrollbar {
-    background-color: rgb(0 0 0 / 0%);
-    max-width: 0.5rem;
+  background-color: rgb(0 0 0 / 0%);
+  max-width: 0.5rem;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: rgb(255 255 255 / 25%);
-    border-radius: 10px;
+  background-color: rgb(255 255 255 / 25%);
+  border-radius: 10px;
 }

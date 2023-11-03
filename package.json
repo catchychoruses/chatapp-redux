@@ -12,8 +12,7 @@
     "stylelint": "npm run stylelint --workspace=@chatapp-redux/frontend",
     "stylelint-fix": "npm run stylelint-fix ---workspace=@chatapp-redux/frontend",
     "dev": "conc 'npm:dev --workspace=@chatapp-redux/backend' 'npm:dev --workspace=@chatapp-redux/frontend'",
-    "dockerize": "docker-compose up -d --build",
-    "postinstall": "if [ $CLIENT_ENV ]; then npm run postinstall-client; elif [ $SERVER_ENV ]; then npm run postinstall-server; else echo no environment detected, please set CLIENT_ENV or SERVER_ENV; fi"
+    "dockerize": "docker-compose up -d --build"
   },
   "repository": {
     "type": "git",

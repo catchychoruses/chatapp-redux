@@ -6,29 +6,34 @@ import { CreateRoomAPIResponse } from '@/types';
 
 export const fetchRooms = createAsyncThunk<
   RoomData[],
-  string,
+  string | null,
   { state: RootState }
->('rooms/fetchRooms', async (userID: string, { rejectWithValue, getState }) => {
-  const currentRoom = getState().rooms.currentRoom;
+>(
+  'rooms/fetchRooms',
+  async (ID: string | null, { rejectWithValue, getState }) => {
+    const currentRoom = getState().rooms.currentRoom;
 
-  const roomsData = await fetchWithToken<RoomData[]>('/get-rooms', {
-    userID
-  });
+    const userID = ID ?? getState().rooms.currentRoom.ID;
 
-  if (!roomsData) return rejectWithValue('Could not get rooms data');
+    const roomsData = await fetchWithToken<RoomData[]>('/get-rooms', {
+      userID
+    });
 
-  if (!currentRoom.ID) {
-    sessionStorage.setItem(
-      'currentRoom',
-      JSON.stringify({
-        ID: roomsData[0].roomID,
-        displayName: roomsData[0].displayName
-      })
-    );
+    if (!roomsData) return rejectWithValue('Could not get rooms data');
+
+    if (!currentRoom.ID) {
+      sessionStorage.setItem(
+        'currentRoom',
+        JSON.stringify({
+          ID: roomsData[0].roomID,
+          displayName: roomsData[0].displayName
+        })
+      );
+    }
+
+    return roomsData;
   }
-
-  return roomsData;
-});
+);
 
 export const newRoom = createAsyncThunk<
   RoomData,
@@ -38,6 +43,9 @@ export const newRoom = createAsyncThunk<
   'rooms/newRoom',
   async (email: string, { rejectWithValue, getState, dispatch }) => {
     const { auth } = getState();
+
+    if (email === auth.userData.email)
+      return rejectWithValue('Do not create a room with yourself only ; (');
 
     const response = await fetchWithToken<CreateRoomAPIResponse>(
       '/new-room',
@@ -54,11 +62,11 @@ export const newRoom = createAsyncThunk<
     dispatch(
       setCurrentRoom({
         nextRoom: {
-          ID: response.newRoom.roomID,
-          displayName: response.newRoom.displayName
+          ID: response.room.roomID,
+          displayName: response.room.displayName
         }
       })
     );
-    return response.newRoom;
+    return response.room;
   }
 );

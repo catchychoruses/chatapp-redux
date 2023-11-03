@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 import { ChatBar } from './ChatBar';
 import styles from './ChatWindow.module.scss';
-import { Send } from 'lucide-react';
+import { SendHorizontal } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/reduxHelpers';
 import {
   selectCurrentRoom,
@@ -12,9 +12,9 @@ import {
 } from '@/store/slices';
 import clsx from 'clsx';
 import { ThemeContext } from '@/context/theme/themeContext';
-import { Button } from '@/shared/components/Button';
 import { SocketContext } from '@/context/socket';
 import { Messages } from './Messages/Messages';
+import { Button, Input } from '@/shared/components';
 
 export const ChatWindow = () => {
   const dispatch = useAppDispatch();
@@ -73,17 +73,17 @@ export const ChatWindow = () => {
           handleSendMessage(msgInput);
         }}
       >
-        <input
+        <Input
           value={msgInput}
           onChange={(e) => handleInput(e.currentTarget.value)}
-          className={clsx(styles['msg-input'], styles[`${theme}-theme`])}
+          className={styles['msg-input']}
           autoFocus
-        ></input>
+        ></Input>
         <Button
           className={styles['send-button']}
           variant="circle"
           type="submit"
-          display={<Send />}
+          display={<SendHorizontal />}
         />
       </form>
     </div>
