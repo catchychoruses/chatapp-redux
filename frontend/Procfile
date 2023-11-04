@@ -1,1 +1,1 @@
-web: npm i -g serve && npx serve dist -p $PORT
+web: npm i -g serve && npx serve dist -p $PORT -c ../serve.json

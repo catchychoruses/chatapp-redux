@@ -43,8 +43,8 @@ export const Auth = () => {
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: 'user@user.com',
+      password: 'user',
       username: ''
     }
   });

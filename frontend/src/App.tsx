@@ -10,7 +10,7 @@ import { SocketContextProvider } from './context/socket';
 
 const BrowserWrapper = () => (
   <SocketContextProvider>
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true }}>
       <Routes>
         <Route path="*" element={<Chat />} />
         <Route path="/login" element={<Auth />} />

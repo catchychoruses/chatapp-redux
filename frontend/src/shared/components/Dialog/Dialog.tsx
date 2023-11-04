@@ -35,7 +35,7 @@ export const NewRoomDialog = ({ isOpen, setIsOpen }: DialogProps) => {
       setModalClosing(false);
       ref.current?.showModal();
     } else {
-      setEmailInput('');
+      setEmailInput('user3@user.com');
       ref.current?.close();
     }
   }, [isOpen, error]);
