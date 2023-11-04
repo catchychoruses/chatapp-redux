@@ -84,14 +84,16 @@ export const NewRoomDialog = ({ isOpen, setIsOpen }: DialogProps) => {
             e.preventDefault(), handleCreate();
           }}
         >
-          <label htmlFor="email">User Email:</label>
-          <Input
-            type="email"
-            name="email"
-            value={emailInput}
-            onChange={(e) => setEmailInput(e.target.value)}
-            autoFocus
-          />
+          <div>
+            <label htmlFor="email">User Email:</label>
+            <Input
+              type="email"
+              name="email"
+              value={emailInput}
+              onChange={(e) => setEmailInput(e.target.value)}
+              autoFocus
+            />
+          </div>
           <Button display="Create" type="submit" />
         </form>
         <p>{error ?? error}</p>
