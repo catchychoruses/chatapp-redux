@@ -120,11 +120,7 @@ export const Auth = () => {
                   </div>
                 </div>
                 <div className={styles.status}>
-                  {error ? (
-                    <p>Error: {error} </p>
-                  ) : (
-                    loading && <p>Loading...</p>
-                  )}
+                  {error ? <p> {error} </p> : loading && <p>Loading...</p>}
                 </div>
               </div>
               <Button display="Login" type="submit" />

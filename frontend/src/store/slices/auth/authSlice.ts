@@ -35,7 +35,7 @@ const authSlice = createSlice({
         state.userData = { ...payload, authenticated: true };
       });
     builder.addCase(loginAPI.rejected, (state, action) => {
-      state.error = String(action.payload);
+      state.error = action.payload || 'Something went wrong...';
     });
     builder.addCase(registerAPI.pending, (state) => {
       state.loading = true;

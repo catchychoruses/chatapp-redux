@@ -64,14 +64,15 @@ app.post('/login', async (req: Request, res: Response) => {
 
     if (user) {
       const userWithUpdatedToken = await loginUser(user, data.password);
-
       if (userWithUpdatedToken) {
         res
           .status(200)
           .json({ ok: true, userData: { ...userWithUpdatedToken } });
+      } else {
+        res.status(200).json({ ok: false, error: 'Incorrect password' });
       }
     } else {
-      res.status(400).send({ ok: false, error: 'User not found' });
+      res.status(200).send({ ok: false, error: 'User not found' });
     }
   } catch (err) {
     if (typeof err === 'string') console.log(err);
@@ -80,7 +81,6 @@ app.post('/login', async (req: Request, res: Response) => {
 
 app.get('/get-rooms', auth, async (req: Request, res: Response) => {
   const { userID } = req.query;
-  console.log('fetching rooms');
   try {
     const rooms = await getAllRooms(String(userID));
 

@@ -1,35 +1,39 @@
-import { LoginAPIResponse } from '@/types.js';
+import { LoginAPIResponse, UserSessionData } from '@/types.js';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { setUserData } from './authSlice';
+import { RootState } from '@/store';
 
-export const loginAPI = createAsyncThunk(
-  'auth/login',
-  async (
-    authData: { email: string; password: string },
-    { rejectWithValue }
-  ) => {
-    const response: LoginAPIResponse = await fetch(
-      `${import.meta.env.VITE_BACKEND_API_URL}/login`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(authData)
-      }
-    ).then((res) => res.json());
+interface LoginData {
+  email: string;
+  password: string;
+}
 
-    if (!response) return rejectWithValue('Could not log in');
-
-    if (!response.ok) return rejectWithValue(response.error);
-
-    if (response.ok) {
-      sessionStorage.setItem(
-        'user',
-        JSON.stringify({ ...response.userData, authenticated: true })
-      );
+export const loginAPI = createAsyncThunk<
+  UserSessionData,
+  LoginData,
+  { state: RootState; rejectValue: string }
+>('auth/login', async (authData: LoginData, { rejectWithValue }) => {
+  const response: LoginAPIResponse = await fetch(
+    `${import.meta.env.VITE_BACKEND_API_URL}/login`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(authData)
     }
-    return response.userData;
+  ).then((res) => res.json());
+
+  if (!response) return rejectWithValue('Could not log in');
+
+  if (!response.ok) return rejectWithValue(response.error);
+
+  if (response.ok) {
+    sessionStorage.setItem(
+      'user',
+      JSON.stringify({ ...response.userData, authenticated: true })
+    );
   }
-);
+  return response.userData;
+});
 
 export const registerAPI = createAsyncThunk(
   'auth/register',

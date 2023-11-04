@@ -65,7 +65,8 @@ export const loginUser = async (
   user: UserData,
   password: string
 ): Promise<UserWithToken | undefined> => {
-  if (await bcrypt.compare(user.password, password)) return undefined;
+  const checkPassword = await bcrypt.compare(password, user.password);
+  if (!checkPassword) return undefined;
 
   const token = jwt.sign(
     { user_ID: user.ID, email: user.email },
