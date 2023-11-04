@@ -2,7 +2,7 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/auth/authSlice';
 import roomsReducer from './slices/rooms/roomsSlice';
 import messagesReducer from './slices/messages/messagesSlice';
-import socketIOMiddleware from './socketIOMiddleware';
+import socketIOMiddleware from './listenerMiddleware';
 
 const rootReducer = combineReducers({
   auth: authReducer,

@@ -7,11 +7,11 @@ import {
   selectUserData,
   setCurrentRoom
 } from '@/store/slices';
-import { addAppListener } from '@/store/socketIOMiddleware';
+import { addAppListener } from '@/store/listenerMiddleware';
 import { MessageType } from '@/types';
 import { useAppDispatch, useAppSelector } from '@/store/reduxHelpers';
 import { fetchRooms } from '@/store/slices/rooms';
-import { throttle } from 'lodash-es';
+import { debounce } from 'lodash-es';
 
 export const useWebSocket = () => {
   const appDispatch = useAppDispatch();
@@ -48,9 +48,16 @@ export const useWebSocket = () => {
     setTimeout(() => appDispatch(fetchRooms(user.ID)), 500);
   };
 
-  const emitTyping = throttle(() => {
-    socket.emit('typing', { username: user.username, roomID: currentRoom.ID });
-  }, 5000);
+  const emitTyping = debounce(
+    () => {
+      socket.emit('typing', {
+        username: user.username,
+        roomID: currentRoom.ID
+      });
+    },
+    3000,
+    { leading: true, trailing: false }
+  );
 
   useEffect(() => {
     if (currentRoom) {
@@ -71,6 +78,7 @@ export const useWebSocket = () => {
             if (message.roomID === currentRoom.ID) {
               dispatch(receiveMessage(message));
               setUserTyping(null);
+              emitTyping.cancel();
             }
 
             dispatch(fetchRooms(ID));
@@ -80,7 +88,7 @@ export const useWebSocket = () => {
     );
 
     return () => unsubscribe({ cancelActive: true });
-  }, [appDispatch, socket]);
+  }, [appDispatch, socket, emitTyping]);
 
   useEffect(() => {
     const unsubscribe = appDispatch(

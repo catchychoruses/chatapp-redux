@@ -26,6 +26,21 @@
     }
   }
 
+  .typing {
+    padding-left: 1.5rem;
+    flex-direction: column;
+    justify-content: center;
+    width: fit-content;
+    min-height: 1.75rem;
+    opacity: 0;
+
+    &.is-typing {
+      bottom: 0;
+
+      opacity: 1;
+    }
+  }
+
   .new-msg {
     display: flex;
     justify-content: space-between;
@@ -35,7 +50,7 @@
     .msg-input {
       width: 100%;
       min-height: 1.5rem;
-      margin: 1rem;
+      margin: 0 1rem 1rem 1rem;
       padding: 0.5rem;
       padding-left: 1rem;
       border-radius: 10px;

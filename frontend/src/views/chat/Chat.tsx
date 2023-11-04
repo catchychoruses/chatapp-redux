@@ -6,7 +6,6 @@ import { useAppDispatch, useAppSelector } from '@/store/reduxHelpers';
 import { selectUserData } from '@/store/slices';
 import { useEffect } from 'react';
 import { logoutAPI } from '@/store/slices/auth/authActions';
-import { SocketContextProvider } from '@/context/socket';
 import { fetchRooms } from '@/store/slices/rooms';
 
 export const Chat = () => {
@@ -32,10 +31,8 @@ export const Chat = () => {
 
   return (
     <main className="main">
-      <SocketContextProvider>
-        <ChatList />
-        <ChatWindow />
-      </SocketContextProvider>
+      <ChatList />
+      <ChatWindow />
     </main>
   );
 };

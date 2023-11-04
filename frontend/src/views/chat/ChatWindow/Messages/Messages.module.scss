@@ -7,18 +7,4 @@
   .status {
     margin: 1.25rem;
   }
-
-  .typing {
-    padding: 0.5rem;
-    padding-left: 1rem;
-    flex-direction: column;
-    justify-content: center;
-    width: fit-content;
-    min-height: 2rem;
-    display: none;
-
-    &.is-typing {
-      display: block;
-    }
-  }
 }

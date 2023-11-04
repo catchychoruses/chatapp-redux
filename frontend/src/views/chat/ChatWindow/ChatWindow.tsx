@@ -60,12 +60,15 @@ export const ChatWindow = () => {
     <div className={clsx(styles['chat-window'], styles[`${theme}-theme`])}>
       <ChatBar theme={theme} />
 
-      <Messages
-        messages={messages}
-        loading={loading}
-        userID={user.ID}
-        userTyping={userTyping}
-      />
+      <Messages messages={messages} loading={loading} userID={user.ID} />
+      <div
+        className={clsx({
+          [styles.typing]: true,
+          [styles['is-typing']]: userTyping
+        })}
+      >
+        {userTyping} is typing...
+      </div>
       <form
         className={styles['new-msg']}
         onSubmit={(e) => {

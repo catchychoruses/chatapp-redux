@@ -6,15 +6,18 @@ import { Provider } from 'react-redux';
 import { store } from './store';
 import { ThemeContextProvider } from './context/theme';
 import { ChatList } from './views/chat/ChatList';
+import { SocketContextProvider } from './context/socket';
 
 const BrowserWrapper = () => (
-  <BrowserRouter>
-    <Routes>
-      <Route path="*" element={<Chat />} />
-      <Route path="/login" element={<Auth />} />
-      <Route path="/chat-list" element={<ChatList />} />
-    </Routes>
-  </BrowserRouter>
+  <SocketContextProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="*" element={<Chat />} />
+        <Route path="/login" element={<Auth />} />
+        <Route path="/chat-list" element={<ChatList />} />
+      </Routes>
+    </BrowserRouter>
+  </SocketContextProvider>
 );
 
 export const AppWrapper = () => (
