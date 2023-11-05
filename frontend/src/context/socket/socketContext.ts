@@ -22,7 +22,8 @@ export const useWebSocket = () => {
 
   const [socket] = useState(() =>
     io(import.meta.env.VITE_BACKEND_API_URL, {
-      transports: ['websocket']
+      transports: ['websocket'],
+      autoConnect: false
     })
   );
 
@@ -71,9 +72,12 @@ export const useWebSocket = () => {
       addAppListener({
         type: 'messages/fetchMessages/fulfilled',
         effect: (action, { dispatch, getState, unsubscribe }) => {
-          unsubscribe();
           const ID = getState().auth.userData.ID;
           const currentRoom = getState().rooms.currentRoom;
+
+          unsubscribe();
+          socket.connect();
+
           socket.on('message', (message: MessageType) => {
             if (message.roomID === currentRoom.ID) {
               dispatch(receiveMessage(message));
@@ -87,7 +91,10 @@ export const useWebSocket = () => {
       })
     );
 
-    return () => unsubscribe({ cancelActive: true });
+    return () => {
+      socket.disconnect();
+      return unsubscribe({ cancelActive: true });
+    };
   }, [appDispatch, socket, emitTyping]);
 
   useEffect(() => {
