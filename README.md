@@ -6,7 +6,7 @@ Fullstack PWA built with React Redux and Socket.io.
 
 - uses RTK Listener Middleware for listening to incoming messages
 - uses Prisma ORM
-- uses JWT for user authentication
+- uses JWT for user/request authentication
 - neatly wrapped in a docker container
 
 wip!
